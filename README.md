@@ -2,7 +2,7 @@
 
 An Arduino IDE compatible graphics and fonts library for AVR processors with a driver for the ILI9341 based TFT displays.
 
-The library contains proportional fonts, different sizes can be enabled/disabled at compile time to optimise the use of FLASH memory.  The library has been tested with the UNO or Mega (ATmega328 or ATmega2560 processor) and the Leonardo compatible boards (ATmega32u4 processor).
+The library contains proportional fonts, different sizes can be enabled/disabled at compile time to optimise the use of FLASH memory.  The library has been tested with the UNO, Mega (ATmega328 or ATmega2560 processor) and the Leonardo compatible boards (ATmega32u4 processor).
 
 The library is designed to be slim and fast. Typically a clear screen for a 320 x 240 TFT will complete in only 174ms. TFT images (320 x 240) can be drawn in 600ms.
 
