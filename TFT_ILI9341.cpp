@@ -787,7 +787,7 @@ void TFT_ILI9341::pushColor(uint16_t color, uint16_t len)
 
 #ifdef F_AS_T
   TFT_CS_L;
-  spiWrite16R(color, len);
+  spiWrite16(color, len);
   TFT_CS_H;
   while (!(SPSR & _BV(SPIF)));
 #else
