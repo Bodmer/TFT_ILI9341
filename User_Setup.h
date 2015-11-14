@@ -48,9 +48,9 @@
 
 // ###### EDIT THE PIN NUMBERS IN THE 3 LINES FOLLOWING TO SUIT YOUR SETUP ######
 
-   TFT_CS  10  // Chip select control pin
-   TFT_DC   9  // Data Command control pin
-   TFT_RST  7  // Reset pin (could connect to Arduino RESET pin)
+#define   TFT_CS  10  // Chip select control pin
+#define   TFT_DC   9  // Data Command control pin
+#define   TFT_RST  7  // Reset pin (could connect to Arduino RESET pin)
 
 // ###### PERSONAL SETUPS, I USE THESE PIN NUMBERS ON SOME OF MY OWN PROJECTS ######
 
