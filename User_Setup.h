@@ -18,7 +18,7 @@
 #define LOAD_FONT4  // Font 4. Medium font, needs ~5848 bytes in FLASH, 96 characters
 #define LOAD_FONT6  // Font 6. Large font, needs ~2666 bytes in FLASH, only characters 1234567890:.apm
 #define LOAD_FONT7  // Font 7. 7 segment font, needs ~2438 bytes in FLASH, only characters 1234567890:.
-#define LOAD_FONT8  // Font 8. Large font needs ~3256 bytes in FLASH, only characters 1234567890:.
+//#define LOAD_FONT8  // Font 8. Large font needs ~3256 bytes in FLASH, only characters 1234567890:.
 
 
 // ##################################################################################
