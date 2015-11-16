@@ -116,6 +116,8 @@ void TFT_ILI9341::restoreSPCR() {
 // libraries.  Otherwise, they simply do nothing.
 
 #ifdef SPI_HAS_TRANSACTION
+  #ifdef SUPPORT_TRANSACTIONS
+
 static inline void spi_begin(void) __attribute__((always_inline));
 
 static inline void spi_begin(void) {
@@ -127,6 +129,12 @@ static inline void spi_end(void) __attribute__((always_inline));
 static inline void spi_end(void) {
   SPI.endTransaction();
 }
+  #else // we do not want to SUPPORT_TRANSACTIONS
+
+#define spi_begin()
+#define spi_end()
+
+  #endif // SUPPORT_TRANSACTIONS
 
 #else
 #define spi_begin()
@@ -155,6 +163,8 @@ void TFT_ILI9341::init(void)
   SPI.setBitOrder(MSBFIRST);
   SPI.setDataMode(SPI_MODE0);
   mySPCR = SPCR;
+
+  spi_end();
 
   // toggle RST low to reset
   if (_rst > 0) {
@@ -573,6 +583,8 @@ void TFT_ILI9341::drawChar(int16_t x, int16_t y, unsigned char c, uint16_t color
     return;
   boolean fillbg = (bg != color);
 
+spi_begin();
+
 #ifdef FAST_GLCD
 // This is about 5 times faster for textsize=1 with background (at 210us per character)
 // but it is not really worth the extra 168 bytes needed...
@@ -637,18 +649,23 @@ void TFT_ILI9341::drawChar(int16_t x, int16_t y, unsigned char c, uint16_t color
       }
     }
   }
+spi_end();
+
 #endif // LOAD_GLCD
 }
 
 void TFT_ILI9341::setWindow(int16_t x0, int16_t y0, int16_t x1, int16_t y1)
 {
+  spi_begin();
   setAddrWindow(x0, y0, x1, y1);
   TFT_CS_H;
   while (!(SPSR & _BV(SPIF)));
+  spi_end();
 }
 
 void TFT_ILI9341::setAddrWindow(int16_t x0, int16_t y0, int16_t x1, int16_t y1)
 {
+spi_begin();
 #ifdef F_AS_T
   // Column addr set
   TFT_DC_C;
@@ -694,13 +711,14 @@ void TFT_ILI9341::setAddrWindow(int16_t x0, int16_t y0, int16_t x1, int16_t y1)
 
   writecommand(ILI9341_RAMWR); // write to RAM
 #endif // F_AS_T
+spi_end();
 }
 
 void TFT_ILI9341::drawPixel(uint16_t x, uint16_t y, uint16_t color)
 {
   // Faster range checking, possible because x and y are unsigned
   if ((x >= _width) || (y >= _height)) return;
-
+  spi_begin();
 #ifdef F_AS_T
   // Column addr set
   TFT_DC_C;
@@ -738,7 +756,6 @@ void TFT_ILI9341::drawPixel(uint16_t x, uint16_t y, uint16_t color)
   TFT_CS_H;
   //TFT_DC_D;
 #else // F_AS_T
-  spi_begin();
   setAddrWindow(x, y, x + 1, y + 1);
 
   *dcport |=  dcpinmask;
@@ -748,13 +765,14 @@ void TFT_ILI9341::drawPixel(uint16_t x, uint16_t y, uint16_t color)
   spiwrite(color);
 
   *csport |= cspinmask;
-  spi_end();
 #endif // F_AS_T
+  spi_end();
 }
 
 void TFT_ILI9341::pushColor(uint16_t color)
 {
   spi_begin();
+
 #ifdef F_AS_T
   TFT_CS_L;
 #else
@@ -821,6 +839,7 @@ void TFT_ILI9341::pushColors(uint16_t *data, uint8_t len)
 {
   uint16_t color;
   spi_begin();
+
 #ifdef F_AS_T
   TFT_DC_D;
   TFT_CS_L;
@@ -898,6 +917,8 @@ void TFT_ILI9341::pushColors(uint8_t *data, uint8_t len)
 
 void TFT_ILI9341::drawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint16_t color)
 {
+  spi_begin();
+
   int8_t steep = abs(y1 - y0) > abs(x1 - x0);
   int16_t xmax = _width, ymax = _height;
 
@@ -966,6 +987,7 @@ void TFT_ILI9341::drawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint1
 		}
 	}
       TFT_CS_H;
+  spi_end();
 }
 
 #else // FAST_LINE not defined so use more compact version
@@ -1032,6 +1054,7 @@ void TFT_ILI9341::drawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color)
 #endif
 
   spi_begin();
+
   setAddrWindow(x, y, x, y + h - 1);
 
 #ifdef F_AS_T
@@ -1048,6 +1071,7 @@ void TFT_ILI9341::drawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color)
   }
   *csport |= cspinmask;
 #endif
+
   spi_end();
 }
 
@@ -1059,7 +1083,8 @@ void TFT_ILI9341::drawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color)
   if ((x >= _width) || (y >= _height)) return;
   if ((x + w - 1) >= _width)  w = _width - x;
 #endif
-  //spi_begin();
+
+  spi_begin();
   setAddrWindow(x, y, x + w - 1, y);
 
 #ifdef F_AS_T
@@ -1076,7 +1101,7 @@ void TFT_ILI9341::drawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color)
   }
   *csport |= cspinmask;
 #endif
-  //spi_end();
+  spi_end();
 }
 
 // fill a rectangle
@@ -1339,6 +1364,7 @@ int TFT_ILI9341::drawChar(unsigned int uniCode, int x, int y, int font)
     else
       // Faster drawing of characters and background using block write
     {
+      spi_begin();
       setAddrWindow(x, y, (x + w * 8) - 1, y + height - 1);
 
       writeBegin();
@@ -1370,6 +1396,7 @@ int TFT_ILI9341::drawChar(unsigned int uniCode, int x, int y, int font)
       }
       while (!(SPSR & _BV(SPIF)));
       writeEnd();
+      spi_end();
     }
   }
 
@@ -1381,6 +1408,7 @@ int TFT_ILI9341::drawChar(unsigned int uniCode, int x, int y, int font)
 #ifdef LOAD_RLE  //674 bytes of code
   // Font is not 2 and hence is RLE encoded
   {
+    spi_begin();
     SPDR = 0; // Dummy write to ensure SPIF flag gets set for first check in while() loop
     w *= height; // Now w is total number of pixels in the character
     if ((textsize != 1) || (textcolor == textbgcolor)) {
@@ -1444,10 +1472,12 @@ int TFT_ILI9341::drawChar(unsigned int uniCode, int x, int y, int font)
       }
       while (!(SPSR & _BV(SPIF)));
       writeEnd();
+      spi_end();
     }
     else // Text colour != background && textsize = 1
          // so use faster drawing of characters and background using block write
     {
+      spi_begin();
       setAddrWindow(x, y, x + width - 1, y + height - 1);
       writeBegin();
       // Maximum font size is equivalent to 180x180 pixels in area
@@ -1484,6 +1514,7 @@ int TFT_ILI9341::drawChar(unsigned int uniCode, int x, int y, int font)
       }
       while (!(SPSR & _BV(SPIF)));
       writeEnd();
+      spi_end();
     }
   }
   // End of RLE font rendering

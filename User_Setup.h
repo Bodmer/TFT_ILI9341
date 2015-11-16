@@ -1,6 +1,7 @@
 //                            USER DEFINED SETTINGS V15
 //            Set fonts to be loaded, pins used and SPI control method
 
+
 // ##################################################################################
 //
 // Define the fonts that are to be used here
@@ -48,16 +49,16 @@
 
 // ###### EDIT THE PIN NUMBERS IN THE 3 LINES FOLLOWING TO SUIT YOUR SETUP ######
 
-#define   TFT_CS  10  // Chip select control pin
-#define   TFT_DC   9  // Data Command control pin
-#define   TFT_RST  7  // Reset pin (could connect to Arduino RESET pin)
+//#define TFT_CS  10  // Chip select control pin
+//#define TFT_DC   9  // Data Command control pin
+//#define TFT_RST  7  // Reset pin (could connect to Arduino RESET pin)
 
 // ###### PERSONAL SETUPS, I USE THESE PIN NUMBERS ON SOME OF MY OWN PROJECTS ######
 
 // SD Card leonardo
-//#define TFT_CS  10   // Chip select control pin
-//#define TFT_DC   7   // Data Command control pin
-//#define TFT_RST  8   // Reset pin (could connect to Arduino RESET pin)
+#define TFT_CS  10   // Chip select control pin
+#define TFT_DC   7   // Data Command control pin
+#define TFT_RST  8   // Reset pin (could connect to Arduino RESET pin)
 
 // Geiger leonardo
 //#define TFT_CS  10   // Chip select control pin
@@ -88,13 +89,13 @@
 // this next line will speed up rendering x5, code size will increase 136 bytes
 // Only worth it if you print lots of GLCD font text...
 
-//#define FAST_GLCD
+#define FAST_GLCD
 
 // Uncomment the following #define to invoke a 20% faster drawLine() function
 // This speeds up other funtions such as triangle outline drawing too
 // Code size penalty is about 72 bytes
 
-#define FAST_LINE
+//#define FAST_LINE
 
 // Comment out the following #define to stop boundary checking and clipping
 // for fillRectangle()and fastH/V lines. This speeds up other funtions such as text
@@ -102,4 +103,11 @@
 // boundary. Code saving for no bounds check (i.e. commented out) is 316 bytes
 
 //#define CLIP_CHECK
+
+// Comment out the following #define if "SPI Transactions" do not need to be
+// supported. Tranaction support is required if other SPI devices use interrupts.
+// When commented out the code size will be ~700 bytes smaller and sketches will
+// run slightly faster, so leave it commented out unless you need it!
+
+// #define SUPPORT_TRANSACTIONS
 
