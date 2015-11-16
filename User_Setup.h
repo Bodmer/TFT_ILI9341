@@ -49,16 +49,16 @@
 
 // ###### EDIT THE PIN NUMBERS IN THE 3 LINES FOLLOWING TO SUIT YOUR SETUP ######
 
-//#define TFT_CS  10  // Chip select control pin
-//#define TFT_DC   9  // Data Command control pin
-//#define TFT_RST  7  // Reset pin (could connect to Arduino RESET pin)
+#define TFT_CS  10  // Chip select control pin
+#define TFT_DC   9  // Data Command control pin
+#define TFT_RST  7  // Reset pin (could connect to Arduino RESET pin)
 
 // ###### PERSONAL SETUPS, I USE THESE PIN NUMBERS ON SOME OF MY OWN PROJECTS ######
 
 // SD Card leonardo
-#define TFT_CS  10   // Chip select control pin
-#define TFT_DC   7   // Data Command control pin
-#define TFT_RST  8   // Reset pin (could connect to Arduino RESET pin)
+//#define TFT_CS  10   // Chip select control pin
+//#define TFT_DC   7   // Data Command control pin
+//#define TFT_RST  8   // Reset pin (could connect to Arduino RESET pin)
 
 // Geiger leonardo
 //#define TFT_CS  10   // Chip select control pin
