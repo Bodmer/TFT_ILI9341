@@ -95,7 +95,7 @@
 // This speeds up other funtions such as triangle outline drawing too
 // Code size penalty is about 72 bytes
 
-//#define FAST_LINE
+#define FAST_LINE
 
 // Comment out the following #define to stop boundary checking and clipping
 // for fillRectangle()and fastH/V lines. This speeds up other funtions such as text
