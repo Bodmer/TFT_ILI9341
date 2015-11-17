@@ -256,7 +256,6 @@ class TFT_ILI9341 : public Print {
 
            fillScreen(uint16_t color),
 
-           writeBegin(void),
            writeEnd(void),
            backupSPCR(void),
            restoreSPCR(void),

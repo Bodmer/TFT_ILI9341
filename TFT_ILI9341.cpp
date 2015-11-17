@@ -82,17 +82,6 @@ void TFT_ILI9341::writedata(uint8_t c)
   *csport |= cspinmask;
 }
 
-void TFT_ILI9341::writeBegin()
-{
-#ifdef F_AS_T
-  //TFT_DC_D;
-  //TFT_CS_L;
-#else
-  *dcport |=  dcpinmask;
-  *csport &= ~cspinmask;
-#endif
-}
-
 void TFT_ILI9341::writeEnd() {
 #ifdef F_AS_T
   TFT_CS_H;
