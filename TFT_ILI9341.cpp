@@ -758,9 +758,6 @@ void TFT_ILI9341::drawPixel(uint16_t x, uint16_t y, uint16_t color)
 #else // F_AS_T
   setAddrWindow(x, y, x + 1, y + 1);
 
-  *dcport |=  dcpinmask;
-  *csport &= ~cspinmask;
-
   spiwrite(color >> 8);
   spiwrite(color);
 
@@ -1061,8 +1058,7 @@ void TFT_ILI9341::drawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color)
   spiWrite16(color, h);
   TFT_CS_H;
 #else
-  *dcport |=  dcpinmask;
-  *csport &= ~cspinmask;
+
   uint8_t hi = color >> 8, lo = color;
   while (h) {
     h--;
@@ -1091,8 +1087,6 @@ void TFT_ILI9341::drawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color)
   spiWrite16(color, w);
   TFT_CS_H;
 #else
-  *dcport |=  dcpinmask;
-  *csport &= ~cspinmask;
   uint8_t hi = color >> 8, lo = color;
   while (w) {
     w--;
@@ -1122,8 +1116,7 @@ void TFT_ILI9341::fillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t 
   TFT_CS_H;
 #else
   uint8_t hi = color >> 8, lo = color;
-  *dcport |=  dcpinmask;
-  *csport &= ~cspinmask;
+
   while(h--) {
     while (w--) {
       spiwrite(hi);
@@ -1367,7 +1360,6 @@ int TFT_ILI9341::drawChar(unsigned int uniCode, int x, int y, int font)
       spi_begin();
       setAddrWindow(x, y, (x + w * 8) - 1, y + height - 1);
 
-      writeBegin();
       byte mask;
       for (int i = 0; i < height; i++)
       {
@@ -1440,7 +1432,7 @@ int TFT_ILI9341::drawChar(unsigned int uniCode, int x, int y, int font)
             pc++; // This is faster than putting pc+=line before while() as we use up SPI wait time
             while (!(SPSR & _BV(SPIF)));
             setAddrWindow(px, py, px + ts, py + ts);
-            writeBegin();
+
             if (ts) {
               tnp = np;
               while (tnp--) {
@@ -1479,7 +1471,7 @@ int TFT_ILI9341::drawChar(unsigned int uniCode, int x, int y, int font)
     {
       spi_begin();
       setAddrWindow(x, y, x + width - 1, y + height - 1);
-      writeBegin();
+
       // Maximum font size is equivalent to 180x180 pixels in area
       while (w > 0)
       {
