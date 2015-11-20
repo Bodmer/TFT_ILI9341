@@ -831,14 +831,10 @@ void TFT_ILI9341::pushColors(uint16_t *data, uint8_t len)
   spi_begin();
 
 #ifdef F_AS_T
-  TFT_DC_D;
   TFT_CS_L;
 #else
-  *dcport |=  dcpinmask;
   *csport &= ~cspinmask;
 #endif
-  //uint8_t backupSPCR =SPCR;
-  //SPCR = mySPCR;
 
   while (len--) {
     color = *data++;
@@ -850,8 +846,6 @@ void TFT_ILI9341::pushColors(uint16_t *data, uint8_t len)
     SPDR = color;
   }
   while (!(SPSR & _BV(SPIF)));
-
-  //SPCR = backupSPCR;
 
 #ifdef F_AS_T
   TFT_CS_H;
@@ -865,36 +859,35 @@ void TFT_ILI9341::pushColors(uint16_t *data, uint8_t len)
 // This is the byte array version for 16 bit raw images.
 void TFT_ILI9341::pushColors(uint8_t *data, uint8_t len)
 {
-  //byte colorLSB;
   spi_begin();
+  uint16_t len2 = len<<1;
 
 #ifdef F_AS_T
-  TFT_DC_D;
   TFT_CS_L;
-#else
-  *dcport |=  dcpinmask;
-  *csport &= ~cspinmask;
-#endif
-
-  //uint8_t backupSPCR =SPCR;
-  //SPCR = mySPCR;
-  while (len--) {
-    // This order is fast as we loop back during the SPI wait period
-    while (!(SPSR & _BV(SPIF)));
+  while (len2--) {
     SPDR = *data++;
-    asm volatile( "nop\n\t" ::);
+    // Wait 11 clock cycles
+    asm volatile
+    (
+      "	adiw	r24,0  \n"	// 2
+      "	rcall	1f     \n"	// 9
+      "	rjmp 	2f     \n"	// 11
+      "1:	ret    \n"	//
+      "2:	       \n"	//
+    );
+  }
+  TFT_CS_H;
+#else
+  *csport &= ~cspinmask;
+  while (len2--) {
+    asm volatile( "nop\n\t" ::); // Sync bit check
     while (!(SPSR & _BV(SPIF)));
     SPDR = *data++;
   }
-  while (!(SPSR & _BV(SPIF)));
-  //SPCR = backupSPCR;
-
-#ifdef F_AS_T
-  TFT_CS_H;
-#else
   *csport |= cspinmask;
 #endif
 
+  while (!(SPSR & _BV(SPIF)));
   spi_end();
 }
 
