@@ -42,6 +42,17 @@ TFT_ILI9341::TFT_ILI9341(int16_t w, int16_t h)
   _rst  = TFT_RST;
   _mosi  = _sclk = 0;
 
+  csport    = portOutputRegister(digitalPinToPort(_cs));
+  cspinmask = digitalPinToBitMask(_cs);
+  dcport    = portOutputRegister(digitalPinToPort(_dc));
+  dcpinmask = digitalPinToBitMask(_dc);
+
+  *dcport |=  dcpinmask;
+  pinMode(_dc, OUTPUT);
+
+  *csport |= cspinmask;
+  pinMode(_cs, OUTPUT);
+
   _width    = w;
   _height   = h;
   rotation  = 0;
@@ -137,13 +148,6 @@ void TFT_ILI9341::init(void)
     pinMode(_rst, OUTPUT);
     digitalWrite(_rst, LOW);
   }
-
-  pinMode(_dc, OUTPUT);
-  pinMode(_cs, OUTPUT);
-  csport    = portOutputRegister(digitalPinToPort(_cs));
-  cspinmask = digitalPinToBitMask(_cs);
-  dcport    = portOutputRegister(digitalPinToPort(_dc));
-  dcpinmask = digitalPinToBitMask(_dc);
 
   SPI.begin();
 
