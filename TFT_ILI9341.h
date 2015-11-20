@@ -252,7 +252,7 @@ class TFT_ILI9341 : public Print {
            pushColor(uint16_t color, uint16_t len),
 
            pushColors(uint16_t *data, uint8_t len),
-           pushColors(uint8_t  *data, uint8_t len),
+           pushColors(uint8_t  *data, uint16_t len),
 
            fillScreen(uint16_t color),
 

@@ -857,14 +857,14 @@ void TFT_ILI9341::pushColors(uint16_t *data, uint8_t len)
 }
 
 // This is the byte array version for 16 bit raw images.
-void TFT_ILI9341::pushColors(uint8_t *data, uint8_t len)
+void TFT_ILI9341::pushColors(uint8_t *data, uint16_t len)
 {
   spi_begin();
-  uint16_t len2 = len<<1;
+  len = len<<1;
 
 #ifdef F_AS_T
   TFT_CS_L;
-  while (len2--) {
+  while (len--) {
     SPDR = *data++;
     // Wait 11 clock cycles
     asm volatile
@@ -879,7 +879,7 @@ void TFT_ILI9341::pushColors(uint8_t *data, uint8_t len)
   TFT_CS_H;
 #else
   *csport &= ~cspinmask;
-  while (len2--) {
+  while (len--) {
     asm volatile( "nop\n\t" ::); // Sync bit check
     while (!(SPSR & _BV(SPIF)));
     SPDR = *data++;
