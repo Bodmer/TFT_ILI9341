@@ -2,8 +2,8 @@
 //
 // This font has been 8 bit Run Length Encoded to save FLASH space
 //
-// It is a Arial 70 pixel height font intended to display large numbers
-// This font only contains characters [space] 0 1 2 3 4 5 6 7 8 9 0 : .
+// It is a Arial 75 pixel height font intended to display large numbers
+// This font only contains characters [space] 0 1 2 3 4 5 6 7 8 9 0 : - .
 // All other characters print as a space
 
 #include <avr/pgmspace.h>
@@ -32,6 +32,14 @@ PROGMEM const unsigned char chr_f72_20[] =
 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 
 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 
 0x7E
+};
+
+PROGMEM const unsigned char chr_f72_2D[] = 
+{
+0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F,
+0x53, 0x91, 0x0A, 0x91, 0x0A, 0x91, 0x0A, 0x91,
+0x0A, 0x91, 0x0A, 0x91, 0x7F, 0x7F, 0x7F, 0x7F,
+0x7F, 0x7F, 0x7F, 0x07
 };
 
 PROGMEM const unsigned char chr_f72_2E[] = 
@@ -349,7 +357,7 @@ PROGMEM const unsigned char chr_f72_3A[] =
 PROGMEM const unsigned char * const chrtbl_f72[96] =        // character pointer table
 {
         chr_f72_20, chr_f72_20, chr_f72_20, chr_f72_20, chr_f72_20, chr_f72_20, chr_f72_20, chr_f72_20, 
-        chr_f72_20, chr_f72_20, chr_f72_20, chr_f72_20, chr_f72_20, chr_f72_20, chr_f72_2E, chr_f72_20, 
+        chr_f72_20, chr_f72_20, chr_f72_20, chr_f72_20, chr_f72_20, chr_f72_2D, chr_f72_2E, chr_f72_20, 
         chr_f72_30, chr_f72_31, chr_f72_32, chr_f72_33, chr_f72_34, chr_f72_35, chr_f72_36, chr_f72_37, 
         chr_f72_38, chr_f72_39, chr_f72_3A, chr_f72_20, chr_f72_20, chr_f72_20, chr_f72_20, chr_f72_20,
         chr_f72_20, chr_f72_20, chr_f72_20, chr_f72_20, chr_f72_20, chr_f72_20, chr_f72_20, chr_f72_20,
