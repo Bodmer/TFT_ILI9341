@@ -1298,9 +1298,8 @@ int TFT_ILI9341::drawChar(unsigned int uniCode, int x, int y, int font)
 
 #ifdef LOAD_FONT2 // chop out 962 bytes of code if we do not need it
   if (font == 2) {
-    w = w + 7;
+    w = w + 6; // Should be + 7 but we need to compensate for width increment
     w = w / 8;
-    width++; // Add a gap further of 1 pixel between characters for this font
     if (x + width * textsize >= _width) return width * textsize ;
 
     if (textcolor == textbgcolor || textsize != 1) {
