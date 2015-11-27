@@ -1668,10 +1668,9 @@ int TFT_ILI9341::drawRightString(char *string, int dX, int poY, int font)
 ***************************************************************************************/
 int TFT_ILI9341::drawNumber(long long_num, int poX, int poY, int font)
 {
-  char tmp[12];
-  if (long_num < 0) sprintf(tmp, "%li", long_num);
-  else sprintf(tmp, "%lu", long_num);
-  return drawString(tmp, poX, poY, font);
+  char str[12];
+  ltoa(long_num, str, 10);
+  return drawString(str, poX, poY, font);
 }
 
 /***************************************************************************************
@@ -1679,71 +1678,64 @@ int TFT_ILI9341::drawNumber(long long_num, int poX, int poY, int font)
 ** Descriptions:            drawFloat, prints 7 non zero digits maximum
 ***************************************************************************************/
 // Adapted to assemble and print a string, this permits alignment relative to a datum
+// looks complicated but much more compact and actually faster than using print class
 int TFT_ILI9341::drawFloat(float floatNumber, int decimal, int poX, int poY, int font)
 {
-  char tmp[12] = "...";       // Array to contain decimal string
-  uint8_t ptr = 0;    // Initialise pointer for array
-  int8_t  digits = 1; // Count the digits to avoid array overflow
-
-  if (decimal >7) decimal = 7; // Limit the size of decimal
-
-  unsigned long temp = 0;
-  float decy = 0.0;
+  char str[12] = "...";       // Array to contain decimal string
+  uint8_t ptr = 0;            // Initialise pointer for array
+  int8_t  digits = 1;         // Count the digits to avoid array overflow
   float rounding = 0.5;
 
-  if (floatNumber < 0.0)    // floatNumber < 0
-  {
-    tmp[ptr]='-'; // Negative number
-    ptr++;        // Increment pointer
-    tmp[ptr] = 0; // Put a null in the array
-    digits=0;     // Set digits to 0 to compensate so pointer value can be used later
-    floatNumber = -floatNumber; // Make positive
-  }
+  if (decimal >7) decimal = 7; // Limit the size of decimal
 
   // Adjust the rounding value
   for (unsigned char i = 0; i < decimal; ++i) rounding /= 10.0;
 
+  if (floatNumber < -rounding)    // add sign, avoid - sign on 0.0
+  {
+    str[ptr]='-'; // Negative number
+    ptr++;        // Increment pointer
+    str[ptr] = 0; // Put a null in the array
+    digits=0;     // Set digits to 0 to compensate so pointer value can be used later
+    floatNumber = -floatNumber; // Make positive
+  }
+
   floatNumber += rounding;
 
   // Get integer part
-  temp = (long)floatNumber;
+  unsigned long temp = (unsigned long)floatNumber;
 
   if (temp <= 10000000) // No more than 7 digits
   {
     // Put integer part into array
-    sprintf(tmp+ptr, "%lu", temp);
+    ltoa(temp, str + ptr, 10);
 
-    // Find out where the null is to get the digit count loaded by sprintf()
-    ptr = 0;
-    while((byte)tmp[ptr]!=0) ptr++; // Move the pointer along
-    digits+=ptr; // Count the digits
+    // Find out where the null is to get the digit count loaded
+    while((byte)str[ptr]!=0) ptr++; // Move the pointer along
+    digits+=ptr;                    // Count the digits
 
-    // If the decimal part is non zero add the decimal point
-    if (decimal > 0)
-    {
-      tmp[ptr] = '.';
-      ptr++;
-      tmp[ptr] = '0'; //Add a dummy zero in case integer value has 8 digits
-      tmp[ptr+1] = 0; //Add a null but don't increment pointer so zero can be overwritten
-    }
+    str[ptr] = '.'; // Add decimal point
+    ptr++;
+    str[ptr] = '0'; //Add a dummy zero in case integer value has 8 digits
+    str[ptr+1] = 0; //Add a null but don't increment pointer so zero can be overwritten
 
     // Get the decimal portion
-    decy = floatNumber - temp;
+    floatNumber = floatNumber - temp;
     byte i = 0;
 
     // Get decimal digits one by one and put in array, limit total digits to 8
     while ((i < decimal) && (digits < 9))
     {
       i++;
-      decy *= 10;       // for the next decimal
-      temp = decy;      // get the decimal
-      sprintf(tmp+ptr, "%lu", temp); // Put digit in array
-      ptr++; digits++;  // Increment pointer and digits count
-      decy -= temp;     // Remove that digit
+      floatNumber *= 10;       // for the next decimal
+      temp = floatNumber;      // get the decimal
+      ltoa(temp, str + ptr, 10);
+      ptr++; digits++;         // Increment pointer and digits count
+      floatNumber -= temp;     // Remove that digit
     }
   }
   // Now we can plot the string and return pixel length
-  return drawString(tmp, poX, poY, font);
+  return drawString(str, poX, poY, font);
 }
 
 /***************************************************************************************
