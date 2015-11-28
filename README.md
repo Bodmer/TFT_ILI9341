@@ -14,3 +14,5 @@ Example connections between the Arduino board and the TFT can be found here:
 
 http://www.instructables.com/id/Arduino-TFT-display-and-font-library/
 
+Soon a dedicated Instructable will be available to document the library features, until then do explore the example sketches.
+Have fun!
