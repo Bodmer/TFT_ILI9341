@@ -52,6 +52,8 @@ drawCentreString	KEYWORD2
 drawRightString	KEYWORD2
 height	KEYWORD2
 width	KEYWORD2
+textWidth	KEYWORD2
+fontHeight	KEYWORD2
 
 spiWrite16
 write
