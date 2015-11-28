@@ -16,7 +16,7 @@
  ****************************************************/
 
 // Include header file that defines the fonts loaded and the pins to be used
-#include <User_Setup.h>
+#include <User_Setup2.h>
 
 // Include header file from the FastLED library for fast pin toggling using direct port access
 #include <TFT_FastPin.h>
@@ -195,7 +195,7 @@ typedef struct {
 const PROGMEM fontinfo fontdata [] = {
    { 0, 0, 0 },
 
-   { 0, 0, 0 },
+   { 0, 0, 8 },
 
   #ifdef LOAD_FONT2
    { (const unsigned char *)chrtbl_f16, widtbl_f16, chr_hgt_f16},
@@ -314,7 +314,9 @@ class TFT_ILI9341 : public Print {
            drawRightString(char *string, int dX, int poY, int font),
 
            height(void),
-           width(void);
+           width(void),
+           textWidth(char *string, int font),
+           fontHeight(int font);
 
     void  spiWrite16(uint16_t data, int16_t count);
     void  spiWrite16s(uint16_t data);

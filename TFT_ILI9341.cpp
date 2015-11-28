@@ -564,6 +564,34 @@ int16_t TFT_ILI9341::height(void)
   return _height;
 }
 
+// Return the width of a string in a given font
+int16_t TFT_ILI9341::textWidth(char *string, int font)
+{
+  unsigned int str_width  = 0;
+  char uniCode;
+  char *widthtable;
+
+  if (font>1 && font<9)
+  widthtable = (char *)pgm_read_word( &(fontdata[font].widthtbl ) ) - 32; //subtract the 32 outside the loop
+
+  while (*string)
+  {
+    uniCode = *string++;
+#ifdef LOAD_GLCD
+    if (font == 1) str_width += 6;
+    else
+#endif
+    str_width += pgm_read_byte( widthtable + uniCode); // Normally we need to subract 32 from uniCode
+  }
+  return str_width;
+}
+
+// Return the height of a font
+int16_t TFT_ILI9341::fontHeight(int font)
+{
+  return pgm_read_byte( &fontdata[font].height ) * textsize;
+}
+
 
 // Draw a character - only used for the original Adafruit font to retain backwards compatibility
 void TFT_ILI9341::drawChar(int16_t x, int16_t y, unsigned char c, uint16_t color, uint16_t bg, uint8_t size)
@@ -1511,31 +1539,11 @@ int TFT_ILI9341::drawString(char *string, int poX, int poY, int font)
 
   if (textdatum || padX)
   {
-    char *pointer = string;
-    unsigned int cwidth  = 0;
-    char uniCode;
-    char *widthtable;
+    // Find the pixel width of the string in the font
+    unsigned int cwidth  = textWidth(string, font) * textsize;
 
-    if (font>1 && font<9)
-    widthtable = (char *)pgm_read_word( &(fontdata[font].widthtbl ) );
-
-    while (*pointer)
-    {
-      uniCode = *pointer++;
-#ifdef LOAD_GLCD
-      if (font == 1) cwidth += 6;
-      else
-#endif
-      cwidth += pgm_read_byte( widthtable + uniCode - 32);
-    }
-
-#ifdef LOAD_GLCD
-    if (font == 1) cheight = 8 * textsize;
-    else
-#endif
+    // Get the pixel height of the font
     cheight = pgm_read_byte( &fontdata[font].height ) * textsize;
-
-    cwidth  = cwidth  * textsize;
 
     switch(textdatum) {
       case TC_DATUM:
@@ -1575,6 +1583,7 @@ int TFT_ILI9341::drawString(char *string, int poX, int poY, int font)
         padding = 3;
         break;
     }
+    // Check coordinates are OK, adjust if not
     if (poX < 0) poX = 0;
     if (poX+cwidth>_width)   poX = _width - cwidth;
     if (poY < 0) poY = 0;
