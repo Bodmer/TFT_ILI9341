@@ -1197,7 +1197,7 @@ size_t TFT_ILI9341::write(uint8_t uniCode)
       width = pgm_read_byte(widtbl_f16 + uniCode-32);
       height = chr_hgt_f16;
       // Font 2 is rendered in whole byte widths so we must allow for this
-      width = (width + 7) / 8;  // Width in whole bytes for font 2
+      width = (width + 6) / 8;  // Width in whole bytes for font 2, should be + 7 but must allow for font width change
       width = width * 8;        // Width converted back to pixles
   }
   #ifdef LOAD_RLE
