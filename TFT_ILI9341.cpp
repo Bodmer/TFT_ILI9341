@@ -1260,6 +1260,8 @@ size_t TFT_ILI9341::write(uint8_t uniCode)
       width =  6;
       height = 8;
   }
+#else
+  if (textfont==1) return 0;
 #endif
 
   height = height * textsize;
