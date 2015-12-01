@@ -141,6 +141,11 @@ static inline void spi_end(void) {
 #define spi_end()
 #endif
 
+// included for backwards compatibility
+void TFT_ILI9341::begin(void)
+{
+ init();
+}
 
 void TFT_ILI9341::init(void)
 {
@@ -800,9 +805,9 @@ void TFT_ILI9341::pushColor(uint16_t color)
   //uint8_t backupSPCR =SPCR;
   //SPCR = mySPCR;
 
-  SPDR = color;
-  while (!(SPSR & _BV(SPIF)));
   SPDR = color>>8;
+  while (!(SPSR & _BV(SPIF)));
+  SPDR = color;
   while (!(SPSR & _BV(SPIF)));
 
   //SPCR = backupSPCR;
@@ -866,12 +871,17 @@ void TFT_ILI9341::pushColors(uint16_t *data, uint8_t len)
 
   while (len--) {
     color = *data++;
-    // This order is fast as we loop back & fetch during the SPI wait period!
-    while (!(SPSR & _BV(SPIF)));
     SPDR = color >> 8;
-    asm volatile( "nop\n\t" ::); // Sync bit check
-    while (!(SPSR & _BV(SPIF)));
+    spiWait17(); // Wait 17 clock cycles
     SPDR = color;
+    // Wait 9 clock cycles
+    asm volatile
+    (
+      "	rcall	1f     \n"	// 7
+      "	rjmp 	2f     \n"	// 9
+      "1:	ret    \n"	//
+      "2:	       \n"	//
+    );
   }
   while (!(SPSR & _BV(SPIF)));
 
