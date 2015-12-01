@@ -113,6 +113,7 @@
 // supported. Tranaction support is required if other SPI devices use interrupts.
 // When commented out the code size will be ~700 bytes smaller and sketches will
 // run slightly faster, so leave it commented out unless you need it!
+// Transaction support is needed to work with SD libraru but not needed with TFT_SdFat
 
 // #define SUPPORT_TRANSACTIONS
 
