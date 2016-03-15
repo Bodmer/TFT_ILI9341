@@ -4,6 +4,7 @@
 
 // Width has been increased by 1 pixel so pixel lengths are calculated correctly
 // for the displayed string
+
 PROGMEM const unsigned char widtbl_f16[96] =         // character width table
 {
         6, 3, 4, 9, 8, 9, 9, 3,             // char 32 - 39
@@ -11,11 +12,11 @@ PROGMEM const unsigned char widtbl_f16[96] =         // character width table
         8, 8, 8, 8, 8, 8, 8, 8,             // char 48 - 55
         8, 8, 3, 3, 6, 6, 6, 8,             // char 56 - 63
         9, 8, 8, 8, 8, 8, 8, 8,             // char 64 - 71
-        8, 4, 8, 8, 7, 10, 8, 8,             // char 72 - 79
-        8, 8, 8, 8, 8, 8, 8, 10,             // char 80 - 87
+        8, 4, 8, 8, 7, 10, 8, 8,            // char 72 - 79
+        8, 8, 8, 8, 8, 8, 8, 10,            // char 80 - 87
         8, 8, 8, 4, 7, 4, 7, 9,             // char 88 - 95
         4, 7, 7, 7, 7, 7, 6, 7,             // char 96 - 103
-        7, 5, 5, 6, 5, 8, 7, 8,             // char 104 - 111
+        7, 4, 5, 6, 4, 8, 7, 8,             // char 104 - 111
         7, 8, 6, 6, 5, 7, 8, 8,             // char 112 - 119
         6, 7, 7, 5, 3, 5, 8, 6              // char 120 - 127
 };

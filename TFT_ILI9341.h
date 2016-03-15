@@ -266,7 +266,6 @@ class TFT_ILI9341 : public Print {
            drawPixel(uint16_t x, uint16_t y, uint16_t color),
 
            drawChar(int16_t x, int16_t y, unsigned char c, uint16_t color, uint16_t bg, uint8_t font),
-           setAddrWindow(int16_t x0, int16_t y0, int16_t x1, int16_t y1),
            setWindow(int16_t x0, int16_t y0, int16_t x1, int16_t y1),
 
            pushColor(uint16_t color),
@@ -302,6 +301,9 @@ class TFT_ILI9341 : public Print {
            fillCircle(int16_t x0, int16_t y0, int16_t r, uint16_t color),
            fillCircleHelper(int16_t x0, int16_t y0, int16_t r, uint8_t cornername, int16_t delta, uint16_t color),
 
+           drawEllipse(int16_t x0, int16_t y0, int16_t rx, int16_t ry, uint16_t color),
+           fillEllipse(int16_t x0, int16_t y0, int16_t rx, int16_t ry, uint16_t color),
+
            drawTriangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint16_t color),
            fillTriangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint16_t color),
 
@@ -324,7 +326,8 @@ class TFT_ILI9341 : public Print {
 
   uint8_t  getRotation(void);
 
-  uint16_t color565(uint8_t r, uint8_t g, uint8_t b);
+  uint16_t fontsLoaded(void),
+           color565(uint8_t r, uint8_t g, uint8_t b);
 
   int16_t  drawChar(unsigned int uniCode, int x, int y, int font),
            drawNumber(long long_num,int poX, int poY, int font),
@@ -347,17 +350,15 @@ class TFT_ILI9341 : public Print {
 
  private:
 
+    void  setAddrWindow(int16_t x0, int16_t y0, int16_t x1, int16_t y1);
+
   uint8_t  tabcolor;
 
   boolean  hwSPI;
 
   uint8_t  mySPCR, savedSPCR;
 
-  volatile uint8_t *mosiport, *clkport, *dcport, *rsport, *csport;
-
   int8_t   _cs, _dc, _rst, _mosi, _miso, _sclk;
- 
-  uint8_t  mosipinmask, clkpinmask, cspinmask, dcpinmask;
 
 
  protected:
@@ -365,7 +366,7 @@ class TFT_ILI9341 : public Print {
   int16_t  _width, _height, // Display w/h as modified by current rotation
            cursor_x, cursor_y, padX;
 
-  uint16_t textcolor, textbgcolor;
+  uint16_t textcolor, textbgcolor, fontsloaded;
 
   uint8_t  textfont,
            textsize,
