@@ -264,6 +264,8 @@ class TFT_ILI9341 : public Print {
   void     init(void), begin(void), // Same - begin included for backwards compatibility
 
            drawPixel(uint16_t x, uint16_t y, uint16_t color),
+           fastPixel(uint16_t x, uint16_t y, uint16_t color),
+           fastSetup(void),
 
            drawChar(int16_t x, int16_t y, unsigned char c, uint16_t color, uint16_t bg, uint8_t font),
            setWindow(int16_t x0, int16_t y0, int16_t x1, int16_t y1),
@@ -280,9 +282,9 @@ class TFT_ILI9341 : public Print {
            backupSPCR(void),
            restoreSPCR(void),
 
-           spiWait17(void),
-           spiWait15(void),
-           spiWait14(void),
+           //spiWait17(void),
+           //spiWait15(void),
+           //spiWait14(void),
 
            drawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint16_t color),
            drawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color),
@@ -342,9 +344,9 @@ class TFT_ILI9341 : public Print {
            textWidth(char *string, int font),
            fontHeight(int font);
 
-    void  spiWrite16(uint16_t data, int16_t count);
-    void  spiWrite16s(uint16_t data);
-    void  spiWrite16R(uint16_t data, int16_t count);
+//    void  spiWrite16(uint16_t data, int16_t count);
+//    void  spiWrite16s(uint16_t data);
+//    void  spiWrite16R(uint16_t data, int16_t count);
 
  virtual  size_t write(uint8_t);
 
@@ -367,6 +369,8 @@ class TFT_ILI9341 : public Print {
            cursor_x, cursor_y, padX;
 
   uint16_t textcolor, textbgcolor, fontsloaded;
+
+  uint16_t  addr_row, addr_col, win_xe, win_ye;
 
   uint8_t  textfont,
            textsize,

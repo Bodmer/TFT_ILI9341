@@ -1,4 +1,4 @@
-//                            USER DEFINED SETTINGS V15
+//                            USER DEFINED SETTINGS V16
 //            Set fonts to be loaded, pins used and SPI control method
 
 
@@ -49,39 +49,9 @@
 
 // ###### EDIT THE PIN NUMBERS IN THE 3 LINES FOLLOWING TO SUIT YOUR SETUP ######
 
-#define TFT_CS  10  // Chip select control pin
-#define TFT_DC   9  // Data Command control pin
+#define TFT_CS   10  // Chip select control pin
+#define TFT_DC   8  // Data Command control pin
 #define TFT_RST  7  // Reset pin (could connect to Arduino RESET pin)
-
-// ###### PERSONAL SETUPS, I USE THESE PIN NUMBERS ON SOME OF MY OWN PROJECTS ######
-
-// SD Card leonardo
-//#define TFT_CS  10   // Chip select control pin
-//#define TFT_DC   7   // Data Command control pin
-//#define TFT_RST  8   // Reset pin (could connect to Arduino RESET pin)
-
-// Geiger leonardo
-//#define TFT_CS  10   // Chip select control pin
-//#define TFT_DC   8   // Data Command control pin
-//#define TFT_RST  7   // Reset pin (could connect to Arduino RESET pin)
-
-// Boxed Geiger Counter
-//#define TFT_CS  10   // Chip select control pin
-//#define TFT_DC   8   // Data Command control pin
-//#define TFT_RST  7   // Reset pin (could connect to Arduino RESET pin)
-
-// ##################################################################################
-//
-// Define whether we want to use delays or SPIF flag to control SPI transactions
-//
-// ##################################################################################
-
-// If we define F_AS_T here then delays are used between SPI transactions
-// to speed up rendering, comment out to "wait" for the SPIF flag instead
-// Commenting out the line stops use of FastPin for control lines
-
-// BUG AWAITING FIX - DO NOT COMMENT OUT IN THIS VERSION
-#define F_AS_T
 
 
 // ##################################################################################

@@ -55,5 +55,3 @@ width	KEYWORD2
 textWidth	KEYWORD2
 fontHeight	KEYWORD2
 
-spiWrite16
-write

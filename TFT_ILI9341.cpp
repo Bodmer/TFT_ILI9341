@@ -23,6 +23,14 @@
 #include "wiring_private.h"
 #include <SPI.h>
 
+inline void spiWait17(void) __attribute__((always_inline));
+inline void spiWait15(void) __attribute__((always_inline));
+inline void spiWait14(void) __attribute__((always_inline));
+inline void spiWait12(void) __attribute__((always_inline));
+inline void spiWrite16(uint16_t data, int16_t count) __attribute__((always_inline));
+inline void spiWrite16s(uint16_t data) __attribute__((always_inline));
+inline void spiWrite16R(uint16_t data, int16_t count) __attribute__((always_inline));
+
 /***************************************************************************************
 ** Function name:           TFT_ILI9341
 ** Description:             Constructor , we must use hardware SPI pins
@@ -57,6 +65,11 @@ TFT_ILI9341::TFT_ILI9341(int16_t w, int16_t h)
   textwrap  = true;
   textdatum = 0; // Left text alignment is default
   fontsloaded = 0;
+
+  addr_row = 0xFFFF;
+  addr_col = 0xFFFF;
+  win_xe = 0xFFFF;
+  win_ye = 0xFFFF;
 
 #ifdef LOAD_GLCD
   fontsloaded = 0x0002; // Bit 1 set
@@ -104,6 +117,7 @@ void TFT_ILI9341::spiwrite(uint8_t c)
 ***************************************************************************************/
 void TFT_ILI9341::writecommand(uint8_t c)
 {
+  byte spsr = SPSR;// We need this here for some reason...
   TFT_DC_C;
   TFT_CS_L;
   spiwrite(c);
@@ -315,10 +329,12 @@ void TFT_ILI9341::drawCircle(int16_t x0, int16_t y0, int16_t r, uint16_t color)
   int16_t ddF_y = - r - r;
   int16_t x = 0;
 
-  drawPixel(x0  , y0 + r, color);
-  drawPixel(x0  , y0 - r, color);
-  drawPixel(x0 + r, y0  , color);
-  drawPixel(x0 - r, y0  , color);
+  fastSetup();
+
+  fastPixel(x0 + r, y0  , color);
+  fastPixel(x0 - r, y0  , color);
+  fastPixel(x0  , y0 - r, color);
+  fastPixel(x0  , y0 + r, color);
 
   while (x < r) {
     if (f >= 0) {
@@ -330,14 +346,15 @@ void TFT_ILI9341::drawCircle(int16_t x0, int16_t y0, int16_t r, uint16_t color)
     ddF_x += 2;
     f += ddF_x;
 
-    drawPixel(x0 + x, y0 + r, color);
-    drawPixel(x0 - x, y0 + r, color);
-    drawPixel(x0 + x, y0 - r, color);
-    drawPixel(x0 - x, y0 - r, color);
-    drawPixel(x0 + r, y0 + x, color);
-    drawPixel(x0 - r, y0 + x, color);
-    drawPixel(x0 + r, y0 - x, color);
-    drawPixel(x0 - r, y0 - x, color);
+    fastPixel(x0 + x, y0 + r, color);
+    fastPixel(x0 - x, y0 + r, color);
+    fastPixel(x0 - x, y0 - r, color);
+    fastPixel(x0 + x, y0 - r, color);
+
+    fastPixel(x0 + r, y0 + x, color);
+    fastPixel(x0 - r, y0 + x, color);
+    fastPixel(x0 - r, y0 - x, color);
+    fastPixel(x0 + r, y0 - x, color);
   }
 }
 
@@ -439,12 +456,14 @@ void TFT_ILI9341::drawEllipse(int16_t x0, int16_t y0, int16_t rx, int16_t ry, ui
   int32_t fy2 = 4 * ry2;
   int32_t s;
 
+  fastSetup();
+
   for (x = 0, y = ry, s = 2*ry2+rx2*(1-2*ry); ry2*x <= rx2*y; x++)
   {
-    drawPixel(x0 + x, y0 + y, color);
-    drawPixel(x0 - x, y0 + y, color);
-    drawPixel(x0 + x, y0 - y, color);
-    drawPixel(x0 - x, y0 - y, color);
+    fastPixel(x0 + x, y0 + y, color);
+    fastPixel(x0 - x, y0 + y, color);
+    fastPixel(x0 - x, y0 - y, color);
+    fastPixel(x0 + x, y0 - y, color);
     if (s >= 0)
     {
       s += fx2 * (1 - y);
@@ -455,10 +474,10 @@ void TFT_ILI9341::drawEllipse(int16_t x0, int16_t y0, int16_t rx, int16_t ry, ui
 
   for (x = rx, y = 0, s = 2*rx2+ry2*(1-2*rx); rx2*y <= ry2*x; y++)
   {
-    drawPixel(x0 + x, y0 + y, color);
-    drawPixel(x0 - x, y0 + y, color);
-    drawPixel(x0 + x, y0 - y, color);
-    drawPixel(x0 - x, y0 - y, color);
+    fastPixel(x0 + x, y0 + y, color);
+    fastPixel(x0 - x, y0 + y, color);
+    fastPixel(x0 - x, y0 - y, color);
+    fastPixel(x0 + x, y0 - y, color);
     if (s >= 0)
     {
       s += fy2 * (1 - x);
@@ -660,11 +679,11 @@ void TFT_ILI9341::fillTriangle ( int16_t x0, int16_t y0, int16_t x1, int16_t y1,
 void TFT_ILI9341::drawBitmap(int16_t x, int16_t y, const uint8_t *bitmap, int16_t w, int16_t h, uint16_t color) {
 
   int16_t i, j, byteWidth = (w + 7) / 8;
-
+  fastSetup();
   for (j = 0; j < h; j++) {
     for (i = 0; i < w; i++ ) {
       if (pgm_read_byte(bitmap + j * byteWidth + i / 8) & (128 >> (i & 7))) {
-        drawPixel(x + i, y + j, color);
+        fastPixel(x + i, y + j, color);
       }
     }
   }
@@ -934,10 +953,56 @@ void TFT_ILI9341::setWindow(int16_t x0, int16_t y0, int16_t x1, int16_t y1)
 
 /***************************************************************************************
 ** Function name:           setAddrWindow
-** Description:             define an area to rexeive a stream of pixels
+** Description:             define an area to receive a stream of pixels
 ***************************************************************************************/
 // Chip select stays low, use setWindow() from sketches
 
+void TFT_ILI9341::setAddrWindow(int16_t x0, int16_t y0, int16_t x1, int16_t y1)
+{
+  spi_begin();
+
+  // Column addr set
+  TFT_DC_C;
+  TFT_CS_L;
+  SPDR = ILI9341_CASET;
+  spiWait15();
+
+  TFT_DC_D;
+  SPDR = x0 >> 8;; spiWait15();
+  addr_col = 0xFFFF;
+  SPDR = x0; spiWait12();
+  if(x1!=win_xe) {
+    SPDR = x1 >> 8; spiWait15();
+    win_xe=x1;
+    SPDR = x1; spiWait14();
+  }
+
+  // Row addr set
+  TFT_DC_C;
+  SPDR = ILI9341_PASET; spiWait15();
+
+  TFT_DC_D;
+  SPDR = y0 >> 8; spiWait12();
+  addr_row = 0xFFFF;
+  SPDR = y0; spiWait17();
+  if(y1!=win_ye) {
+    SPDR = y1 >> 8; spiWait15();
+    win_ye=y1;
+    SPDR = y1; spiWait14();
+  }
+
+  // write to RAM
+  TFT_DC_C;
+  SPDR = ILI9341_RAMWR; spiWait14();
+
+  //CS, HIGH;
+  //TFT_CS_H;
+  TFT_DC_D;
+
+  spi_end();
+}
+
+/*
 void TFT_ILI9341::setAddrWindow(int16_t x0, int16_t y0, int16_t x1, int16_t y1)
 {
   spi_begin();
@@ -974,11 +1039,140 @@ void TFT_ILI9341::setAddrWindow(int16_t x0, int16_t y0, int16_t x1, int16_t y1)
 
   spi_end();
 }
-
+*/
 /***************************************************************************************
 ** Function name:           drawPixel
 ** Description:             push a single pixel at an arbitrary position
 ***************************************************************************************/
+void TFT_ILI9341::drawPixel(uint16_t x, uint16_t y, uint16_t color)
+{
+  // Faster range checking, possible because x and y are unsigned
+  if ((x >= _width) || (y >= _height)) return;
+  spi_begin();
+
+  TFT_CS_L;
+
+if (addr_col != x) {
+  TFT_DC_C;
+  SPDR = ILI9341_CASET;
+  spiWait12();
+  addr_col = x;
+  TFT_DC_D;
+  SPDR = x >> 8; spiWait17();
+  SPDR = x; spiWait17();
+
+  SPDR = x >> 8; spiWait17();
+  SPDR = x; spiWait12();
+}
+
+if (addr_row != y) {
+  TFT_DC_C;
+  SPDR = ILI9341_PASET;
+  spiWait12();
+  addr_row = y;
+  TFT_DC_D;
+  SPDR = y >> 8; spiWait17();
+  SPDR = y; spiWait17();
+
+  SPDR = y >> 8; spiWait17();
+  SPDR = y; spiWait14();
+}
+
+  TFT_DC_C;
+
+  SPDR = ILI9341_RAMWR; spiWait15();
+
+  TFT_DC_D;
+
+  SPDR = color >> 8; spiWait15();
+  win_xe=x;
+  SPDR = color; spiWait12();
+  win_ye=y;
+
+  TFT_CS_H;
+
+  spi_end();
+}
+
+void TFT_ILI9341::fastPixel(uint16_t x, uint16_t y, uint16_t color)
+{
+  // Faster range checking, possible because x and y are unsigned
+  if ((x >= _width) || (y >= _height)) return;
+  spi_begin();
+
+  TFT_CS_L;
+
+if (addr_col != x) {
+  TFT_DC_C;
+  SPDR = ILI9341_CASET;
+  spiWait14();
+  addr_col = x;
+  TFT_DC_D;
+
+  SPDR = x >> 8;; spiWait17();
+  SPDR = x; spiWait12();
+}
+
+if (addr_row != y) {
+  TFT_DC_C;
+  SPDR = ILI9341_PASET;
+  spiWait14();
+  addr_row = y;
+  TFT_DC_D;
+
+  SPDR = y >> 8; spiWait17();
+  SPDR = y; spiWait14();
+}
+
+  TFT_DC_C;
+
+  SPDR = ILI9341_RAMWR; spiWait15();
+
+  TFT_DC_D;
+
+  SPDR = color >> 8; spiWait17();
+  SPDR = color; spiWait14();
+
+  TFT_CS_H;
+
+  spi_end();
+}
+
+void TFT_ILI9341::fastSetup(void)
+{
+  spi_begin();
+
+  TFT_DC_C;
+  TFT_CS_L;
+
+  SPDR = ILI9341_CASET;
+  spiWait15();
+  TFT_DC_D;
+  SPDR = 0; spiWait14();
+  addr_col = 0;
+  SPDR = 0; spiWait12();
+  win_xe=_width-1;
+  SPDR = win_xe >> 8; spiWait15();
+  SPDR = win_xe; spiWait14();
+
+  TFT_DC_C;
+
+  SPDR = ILI9341_PASET;
+  spiWait15();
+  TFT_DC_D;
+  SPDR = 0; spiWait14();
+  addr_row = 0;
+  SPDR = 0; spiWait12();
+  win_ye=_height-1;
+  SPDR = win_ye >> 8; spiWait15();
+  SPDR = win_ye; spiWait14();
+
+  TFT_CS_H;
+
+  spi_end();
+}
+
+/*
 void TFT_ILI9341::drawPixel(uint16_t x, uint16_t y, uint16_t color)
 {
   // Faster range checking, possible because x and y are unsigned
@@ -1023,6 +1217,7 @@ void TFT_ILI9341::drawPixel(uint16_t x, uint16_t y, uint16_t color)
 
   spi_end();
 }
+*/
 
 /***************************************************************************************
 ** Function name:           pushColor
@@ -1195,7 +1390,8 @@ void TFT_ILI9341::drawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint1
 				y0 += ystep;
 				if ((y0 < 0) || (y0 >= ymax)) break;
 				err += dx;
-			     //while (!(SPSR & _BV(SPIF))); // Safe, but can comment out and rely on delay
+			     asm volatile( "nop\n\t" ::);
+                     //while (!(SPSR & _BV(SPIF))); // Safe, but can comment out and rely on delay
                      setAddrWindow(y0, x0+1, y0, xmax);
 			}
 		}
@@ -1210,7 +1406,8 @@ void TFT_ILI9341::drawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint1
 				y0 += ystep;
 				if ((y0 < 0) || (y0 >= ymax)) break;
 				err += dx;
-			     //while (!(SPSR & _BV(SPIF))); // Safe, but can comment out and rely on delay
+			     asm volatile( "nop\n\t" ::);
+                     //while (!(SPSR & _BV(SPIF))); // Safe, but can comment out and rely on delay
                      setAddrWindow(x0+1, y0, xmax, y0);
 			}
 		}
@@ -1353,7 +1550,11 @@ uint16_t TFT_ILI9341::color565(uint8_t r, uint8_t g, uint8_t b)
 ***************************************************************************************/
 void TFT_ILI9341::setRotation(uint8_t m)
 {
-  byte spsr = SPSR;// We need this here for some reason...
+  addr_row = 0xFFFF;
+  addr_col = 0xFFFF;
+  win_xe = 0xFFFF;
+  win_ye = 0xFFFF;
+
   rotation = m % 8;
   spi_begin();
   writecommand(ILI9341_MADCTL);
@@ -1402,6 +1603,7 @@ void TFT_ILI9341::setRotation(uint8_t m)
 
   }
   spi_end();
+  fastSetup(); // Just incase setRotation is called inside a fast pixel loop
 }
 
 /***************************************************************************************
@@ -1949,7 +2151,7 @@ int TFT_ILI9341::drawFloat(float floatNumber, int dp, int poX, int poY, int font
 ** Function name:           spiWrite16
 ** Descriptions:            Delay based assembler loop for fast SPI write
 ***************************************************************************************/
-inline void TFT_ILI9341::spiWrite16(uint16_t data, int16_t count)
+inline void spiWrite16(uint16_t data, int16_t count)
 {
 // We can enter this loop with 0 pixels to draw, so we need to check this
 // if(count<1) { Serial.print("#### Less than 1 ####"); Serial.println(count);}
@@ -1992,7 +2194,7 @@ inline void TFT_ILI9341::spiWrite16(uint16_t data, int16_t count)
 ** Function name:           spiWrite16s
 ** Descriptions:            Write 16 bits, do not wait after last byte sent
 ***************************************************************************************/
-inline void TFT_ILI9341::spiWrite16s(uint16_t data)
+inline void spiWrite16s(uint16_t data)
 {
   uint8_t temp;
   asm volatile
@@ -2018,7 +2220,7 @@ inline void TFT_ILI9341::spiWrite16s(uint16_t data)
 ** Function name:           spiWrite16R with hi<>lo reversed (not used)
 ** Descriptions:            Delay based assembler loop for fast SPI write
 ***************************************************************************************/
-inline void TFT_ILI9341::spiWrite16R(uint16_t data, int16_t count)
+inline void spiWrite16R(uint16_t data, int16_t count)
 {
 // We can enter this loop with 0 pixels to draw, so we need to check this
 // if(count<1) { Serial.print("#### Less than 1 ####"); Serial.println(count);}
@@ -2062,7 +2264,7 @@ inline void TFT_ILI9341::spiWrite16R(uint16_t data, int16_t count)
 ** Function name:           spiWait
 ** Descriptions:            17 cycle delay
 ***************************************************************************************/
-inline void TFT_ILI9341::spiWait17(void)
+inline void spiWait17(void)
 {
   asm volatile
   (
@@ -2078,7 +2280,7 @@ inline void TFT_ILI9341::spiWait17(void)
 ** Function name:           spiWait
 ** Descriptions:            15 cycle delay
 ***************************************************************************************/
-inline void TFT_ILI9341::spiWait15(void)
+inline void spiWait15(void)
 {
   asm volatile
   (
@@ -2096,7 +2298,7 @@ inline void TFT_ILI9341::spiWait15(void)
 ** Function name:           spiWait
 ** Descriptions:            14 cycle delay
 ***************************************************************************************/
-inline void TFT_ILI9341::spiWait14(void)
+inline void spiWait14(void)
 {
   asm volatile
   (
@@ -2105,6 +2307,23 @@ inline void TFT_ILI9341::spiWait14(void)
     "	adiw	r24,0  \n"	// 5
     "	rcall	1f     \n"	// 12
     "	rjmp 	2f     \n"	// 14
+    "1:	ret    \n"	//
+    "2:	       \n"	//
+  );
+}
+
+/***************************************************************************************
+** Function name:           spiWait
+** Descriptions:            12 cycle delay
+***************************************************************************************/
+inline void spiWait12(void)
+{
+  asm volatile
+  (
+    "	nop         \n"	// 1
+    "	adiw	r24,0  \n"	// 3
+    "	rcall	1f     \n"	// 10
+    "	rjmp 	2f     \n"	// 12
     "1:	ret    \n"	//
     "2:	       \n"	//
   );
