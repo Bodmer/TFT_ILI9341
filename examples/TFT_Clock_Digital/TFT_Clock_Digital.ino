@@ -43,8 +43,6 @@
   #########################################################################
  
  Based on clock sketch by Gilchrist 6/2/2014 1.0
- Updated to use new features by Alan Senior 18/1/2015
- Updated by Bodmer to use TFT library
 
 A few colour codes:
  
@@ -72,6 +70,8 @@ code	color
 TFT_ILI9341 tft = TFT_ILI9341();       // Invoke custom library
 
 uint32_t targetTime = 0;                    // for next 1 second timeout
+
+static uint8_t conv2d(const char* p); // Forward declaration needed for IDE 1.6.x
 uint8_t hh=conv2d(__TIME__), mm=conv2d(__TIME__+3), ss=conv2d(__TIME__+6);  // Get H, M, S from compile time
 
 byte omm = 99;
@@ -81,7 +81,7 @@ unsigned int colour = 0;
 
 void setup(void) {
   tft.init();
-  tft.setRotation(2);
+  tft.setRotation(0);
   tft.fillScreen(TFT_BLACK);
 
   tft.setTextSize(1);

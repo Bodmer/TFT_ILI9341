@@ -56,7 +56,10 @@ float sdeg=0, mdeg=0, hdeg=0;
 uint16_t osx=120, osy=120, omx=120, omy=120, ohx=120, ohy=120;  // Saved H, M, S x & y coords
 uint16_t x0=0, x1=0, y0=0, y1=0;
 uint32_t targetTime = 0;                    // for next 1 second timeout
+
+static uint8_t conv2d(const char* p); // Forward declaration needed for IDE 1.6.x
 uint8_t hh=conv2d(__TIME__), mm=conv2d(__TIME__+3), ss=conv2d(__TIME__+6);  // Get H, M, S from compile time
+
 boolean initial = 1;
 
 void setup(void) {
@@ -105,7 +108,7 @@ void setup(void) {
   tft.fillCircle(120, 121, 3, TFT_WHITE);
 
   // Draw text at position 120,260 using fonts 4
-  // Only font numbers 2,4,6,7 are valid. Font 6 only contains characters [space] 0 1 2 3 4 5 6 7 8 9 : . a p m
+  // Only font numbers 2,4,6,7 are valid. Font 6 only contains characters [space] 0 1 2 3 4 5 6 7 8 9 : . - a p m
   // Font 7 is a 7 segment font and only contains characters [space] 0 1 2 3 4 5 6 7 8 9 : .
   tft.drawCentreString("Time flies",120,260,4);
 
