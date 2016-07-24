@@ -968,11 +968,12 @@ void TFT_ILI9341::setAddrWindow(int16_t x0, int16_t y0, int16_t x1, int16_t y1)
   spiWait15();
 
   TFT_DC_D;
-  SPDR = x0 >> 8;; spiWait15();
+  SPDR = x0 >> 8;; spiWait12();
   addr_col = 0xFFFF;
   SPDR = x0; spiWait12();
   if(x1!=win_xe) {
-    SPDR = x1 >> 8; spiWait15();
+    SPDR = x1 >> 8; spiWait12();
+    asm volatile( "nop\n\t" ::);
     win_xe=x1;
     SPDR = x1; spiWait14();
   }
@@ -984,9 +985,10 @@ void TFT_ILI9341::setAddrWindow(int16_t x0, int16_t y0, int16_t x1, int16_t y1)
   TFT_DC_D;
   SPDR = y0 >> 8; spiWait12();
   addr_row = 0xFFFF;
-  SPDR = y0; spiWait17();
+  SPDR = y0; spiWait12();
   if(y1!=win_ye) {
-    SPDR = y1 >> 8; spiWait15();
+    SPDR = y1 >> 8; spiWait12();
+    asm volatile( "nop\n\t" ::);
     win_ye=y1;
     SPDR = y1; spiWait14();
   }
