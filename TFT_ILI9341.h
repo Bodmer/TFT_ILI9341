@@ -360,17 +360,12 @@ class TFT_ILI9341 : public Print {
 
   uint8_t  mySPCR, savedSPCR;
 
-  int8_t   _cs, _dc, _rst, _mosi, _miso, _sclk;
-
-
  protected:
 
-  int16_t  _width, _height, // Display w/h as modified by current rotation
-           cursor_x, cursor_y, padX;
+  int16_t  cursor_x, cursor_y, win_xe, win_ye, padX;
 
-  uint16_t textcolor, textbgcolor, fontsloaded;
-
-  uint16_t  addr_row, addr_col, win_xe, win_ye;
+  uint16_t _width, _height, // Display w/h as modified by current rotation
+           textcolor, textbgcolor, fontsloaded, addr_row, addr_col;
 
   uint8_t  textfont,
            textsize,

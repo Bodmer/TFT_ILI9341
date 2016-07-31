@@ -129,7 +129,7 @@ void loop() {
       xpos += tft.drawChar(':', xpos, ypos - 8, 8);
       if (mm < 10) xpos += tft.drawChar('0', xpos, ypos, 8); // Add minutes leading zero
       xpos += tft.drawNumber(mm, xpos, ypos, 8);             // Draw minutes
-      xsecs = xpos; // Save seconds 'x' position for later display updates
+      xsecs = xpos; // Sae seconds 'x' position for later display updates
     }
     if (oss != ss) { // Redraw seconds time every second
       oss = ss;

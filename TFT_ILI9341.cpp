@@ -37,21 +37,17 @@ inline void spiWrite16R(uint16_t data, int16_t count) __attribute__((always_inli
 ***************************************************************************************/
 TFT_ILI9341::TFT_ILI9341(int16_t w, int16_t h)
 {
-  _cs   = TFT_CS;
-  _dc   = TFT_DC;
-  _rst  = TFT_RST;
-  _mosi  = _sclk = 0;
 
-  if (_rst > 0) {
-    digitalWrite(_rst, LOW);
-    pinMode(_rst, OUTPUT);
+  if (TFT_RST > 0) {
+    digitalWrite(TFT_RST, LOW);
+    pinMode(TFT_RST, OUTPUT);
   }
 
   TFT_DC_D;
-  pinMode(_dc, OUTPUT);
+  pinMode(TFT_DC, OUTPUT);
 
   TFT_CS_H;
-  pinMode(_cs, OUTPUT);
+  pinMode(TFT_CS, OUTPUT);
 
   _width    = w;
   _height   = h;
@@ -117,7 +113,7 @@ void TFT_ILI9341::spiwrite(uint8_t c)
 ***************************************************************************************/
 void TFT_ILI9341::writecommand(uint8_t c)
 {
-  byte spsr = SPSR;// We need this here for some reason...
+  savedSPCR = SPSR;// We need this here for some reason...
   TFT_DC_C;
   TFT_CS_L;
   spiwrite(c);
@@ -221,12 +217,12 @@ void TFT_ILI9341::init(void)
   spi_end();
 
   // toggle RST low to reset
-  if (_rst > 0) {
-    digitalWrite(_rst, HIGH);
+  if (TFT_RST > 0) {
+    digitalWrite(TFT_RST, HIGH);
     delay(5);
-    digitalWrite(_rst, LOW);
+    digitalWrite(TFT_RST, LOW);
     delay(20);
-    digitalWrite(_rst, HIGH);
+    digitalWrite(TFT_RST, HIGH);
     delay(150);
   }
 
@@ -817,6 +813,7 @@ int16_t TFT_ILI9341::textWidth(char *string, int font)
 
   if (font>1 && font<9)
   widthtable = (char *)pgm_read_word( &(fontdata[font].widthtbl ) ) - 32; //subtract the 32 outside the loop
+  else return 0;
 
   while (*string)
   {
@@ -858,8 +855,8 @@ int16_t TFT_ILI9341::fontHeight(int font)
 void TFT_ILI9341::drawChar(int16_t x, int16_t y, unsigned char c, uint16_t color, uint16_t bg, uint8_t size)
 {
 #ifdef LOAD_GLCD
-  if ((x >= _width)            || // Clip right
-      (y >= _height)           || // Clip bottom
+  if ((x >= (int16_t)_width)            || // Clip right
+      (y >= (int16_t)_height)           || // Clip bottom
       ((x + 6 * size - 1) < 0) || // Clip left
       ((y + 8 * size - 1) < 0))   // Clip top
     return;
@@ -1703,8 +1700,8 @@ int TFT_ILI9341::drawChar(unsigned int uniCode, int x, int y, int font)
 #endif
   }
 
-  unsigned int width  = 0;
-  unsigned int height = 0;
+  int width  = 0;
+  int height = 0;
   unsigned int flash_address = 0; // 16 bit address OK for Arduino if font files <60K
   uniCode -= 32;
 
@@ -1744,7 +1741,7 @@ int TFT_ILI9341::drawChar(unsigned int uniCode, int x, int y, int font)
   if (font == 2) {
     w = w + 6; // Should be + 7 but we need to compensate for width increment
     w = w / 8;
-    if (x + width * textsize >= _width) return width * textsize ;
+    if (x + width * textsize >= (int16_t)_width) return width * textsize ;
 
     if (textcolor == textbgcolor || textsize != 1) {
 

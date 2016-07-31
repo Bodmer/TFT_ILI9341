@@ -42,11 +42,6 @@
 //   TFT_DC   9  // Data Command control pin
 //   TFT_RST  7  // Reset pin (could connect to Arduino RESET pin)
 
-// These are the control pins I use on my Leonardo Pro Micro
-//   TFT_CS  10  // Chip select control pin
-//   TFT_DC   9  // Data Command control pin
-//   TFT_RST  7  // Reset pin (could connect to Arduino RESET pin)
-
 // ###### EDIT THE PIN NUMBERS IN THE 3 LINES FOLLOWING TO SUIT YOUR SETUP ######
 
 #define TFT_CS   10  // Chip select control pin
