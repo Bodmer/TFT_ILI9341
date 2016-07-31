@@ -133,14 +133,6 @@ void TFT_ILI9341::writedata(uint8_t c)
 }
 
 /***************************************************************************************
-** Function name:           writeEnd
-** Description:             Raise the Chip Select
-***************************************************************************************/
-void TFT_ILI9341::writeEnd() {
-  TFT_CS_H;
-}
-
-/***************************************************************************************
 ** Function name:           backupSPCR
 ** Description:             Save the SPCR register so it can be restored
 ***************************************************************************************/
@@ -897,6 +889,7 @@ spi_begin();
       SPDR = bg;
     }
     while (!(SPSR & _BV(SPIF)));
+    TFT_CS_H;
   }
   else
 #endif // FAST_GLCD
@@ -1813,7 +1806,7 @@ int TFT_ILI9341::drawChar(unsigned int uniCode, int x, int y, int font)
         pY += textsize;
       }
       while (!(SPSR & _BV(SPIF)));
-      writeEnd();
+      TFT_CS_H;
       spi_end();
     }
   }
@@ -1889,7 +1882,7 @@ int TFT_ILI9341::drawChar(unsigned int uniCode, int x, int y, int font)
         }
       }
       while (!(SPSR & _BV(SPIF)));
-      writeEnd();
+      TFT_CS_H;
       spi_end();
     }
     else // Text colour != background && textsize = 1
@@ -1913,7 +1906,7 @@ int TFT_ILI9341::drawChar(unsigned int uniCode, int x, int y, int font)
         }
       }
       while (!(SPSR & _BV(SPIF)));
-      writeEnd();
+      TFT_CS_H;
       spi_end();
     }
   }
