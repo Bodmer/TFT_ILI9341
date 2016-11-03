@@ -797,7 +797,7 @@ int16_t TFT_ILI9341::height(void)
 ** Function name:           textWidth
 ** Description:             Return the width in pixels of a string in a given font
 ***************************************************************************************/
-int16_t TFT_ILI9341::textWidth(char *string, int font)
+int16_t TFT_ILI9341::textWidth(const char *string, int font)
 {
   unsigned int str_width  = 0;
   char uniCode;
@@ -1824,7 +1824,7 @@ int TFT_ILI9341::drawChar(unsigned int uniCode, int x, int y, int font)
     w *= height; // Now w is total number of pixels in the character
     if ((textsize != 1) || (textcolor == textbgcolor)) {
       if (textcolor != textbgcolor) fillRect(x, pY, width * textsize, textsize * height, textbgcolor);
-      int px = 0, py = pY, tpy = pY; // To hold character block start and end column and row values
+      int px = 0, py = pY; // To hold character block start and end column and row values
       int pc = 0; // Pixel count
       byte np = textsize * textsize; // Number of pixels in a drawn pixel
 
@@ -1919,7 +1919,7 @@ int TFT_ILI9341::drawChar(unsigned int uniCode, int x, int y, int font)
 ** Function name:           drawString
 ** Description :            draw string with padding if it is defined
 ***************************************************************************************/
-int TFT_ILI9341::drawString(char *string, int poX, int poY, int font)
+int TFT_ILI9341::drawString(const char *string, int poX, int poY, int font)
 {
   int16_t sumX = 0;
   uint8_t padding = 1;
@@ -2035,7 +2035,7 @@ return sumX;
 ** Function name:           drawCentreString
 ** Descriptions:            draw string centred on dX
 ***************************************************************************************/
-int TFT_ILI9341::drawCentreString(char *string, int dX, int poY, int font)
+int TFT_ILI9341::drawCentreString(const char *string, int dX, int poY, int font)
 {
   byte tempdatum = textdatum;
   int sumX = 0;
@@ -2049,7 +2049,7 @@ int TFT_ILI9341::drawCentreString(char *string, int dX, int poY, int font)
 ** Function name:           drawRightString
 ** Descriptions:            draw string right justified to dX
 ***************************************************************************************/
-int TFT_ILI9341::drawRightString(char *string, int dX, int poY, int font)
+int TFT_ILI9341::drawRightString(const char *string, int dX, int poY, int font)
 {
   byte tempdatum = textdatum;
   int sumX = 0;
@@ -2199,6 +2199,8 @@ inline void spiWrite16s(uint16_t data)
     "4:	nop     \n" // 17
 
     "	out	%[spi],%[lo]\n"			// write SPI data
+
+    "nop         \n"	// 1
 
     "5:\n"
     : [temp] "=d" (temp)
