@@ -335,13 +335,13 @@ class TFT_ILI9341 : public Print {
            drawNumber(long long_num,int poX, int poY, int font),
            drawFloat(float floatNumber,int decimal,int poX, int poY, int font),
 
-           drawString(char *string, int poX, int poY, int font),
-           drawCentreString(char *string, int dX, int poY, int font),
-           drawRightString(char *string, int dX, int poY, int font),
+           drawString(const char *string, int poX, int poY, int font),
+           drawCentreString(const char *string, int dX, int poY, int font),
+           drawRightString(const char *string, int dX, int poY, int font),
 
            height(void),
            width(void),
-           textWidth(char *string, int font),
+           textWidth(const char *string, int font),
            fontHeight(int font);
 
 //    void  spiWrite16(uint16_t data, int16_t count);
