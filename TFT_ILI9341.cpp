@@ -1542,11 +1542,6 @@ uint16_t TFT_ILI9341::color565(uint8_t r, uint8_t g, uint8_t b)
 ***************************************************************************************/
 void TFT_ILI9341::setRotation(uint8_t m)
 {
-  addr_row = 0xFFFF;
-  addr_col = 0xFFFF;
-  win_xe = 0xFFFF;
-  win_ye = 0xFFFF;
-
   rotation = m % 8;
   spi_begin();
   writecommand(ILI9341_MADCTL);
@@ -1596,6 +1591,11 @@ void TFT_ILI9341::setRotation(uint8_t m)
   }
   spi_end();
   fastSetup(); // Just incase setRotation is called inside a fast pixel loop
+  addr_row = 0xFFFF;
+  addr_col = 0xFFFF;
+  win_xe = 0xFFFF;
+  win_ye = 0xFFFF;
+
 }
 
 /***************************************************************************************
