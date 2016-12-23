@@ -378,7 +378,7 @@ uint32_t testHaD()
 	
 	for (int i = 0; i < 0x10; i++)
 	{
-		tft.setAddrWindow(0, 0, 240-1, 320-1);
+		tft.setWindow(0, 0, 240-1, 320-1);
 
 		uint16_t cnt = 0;
 		uint16_t color = tft.color565((i << 4) | i, (i << 4) | i, (i << 4) | i);
