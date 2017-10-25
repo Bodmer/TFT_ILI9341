@@ -950,7 +950,7 @@ void TFT_ILI9341::setWindow(int16_t x0, int16_t y0, int16_t x1, int16_t y1)
 
 void TFT_ILI9341::setAddrWindow(int16_t x0, int16_t y0, int16_t x1, int16_t y1)
 {
-  spi_begin();
+  //spi_begin(); not needed because all functions calling setAddrWindow already executed this command
 
   // Column addr set
   TFT_DC_C;
@@ -992,7 +992,7 @@ void TFT_ILI9341::setAddrWindow(int16_t x0, int16_t y0, int16_t x1, int16_t y1)
   //TFT_CS_H;
   TFT_DC_D;
 
-  spi_end();
+  //spi_end(); not needed because all functions calling setAddrWindow will execute this command afterwards
 }
 
 /*
