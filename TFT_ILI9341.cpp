@@ -169,6 +169,7 @@ static inline void spi_begin(void) {
 static inline void spi_end(void) __attribute__((always_inline));
 
 static inline void spi_end(void) {
+  while (!(SPSR & _BV(SPIF))); // wait for everything SPI to finish before freeing up the bus
   SPI.endTransaction();
 }
   #else // we do not want to SUPPORT_TRANSACTIONS
