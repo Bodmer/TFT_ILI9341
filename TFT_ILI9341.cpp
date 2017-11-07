@@ -207,7 +207,6 @@ void TFT_ILI9341::init(void)
   SPI.setDataMode(SPI_MODE0);
   mySPCR = SPCR;
 
-  spi_end();
 
   // toggle RST low to reset
   if (TFT_RST > 0) {
