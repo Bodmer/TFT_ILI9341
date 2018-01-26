@@ -169,6 +169,7 @@ static inline void spi_begin(void) {
 static inline void spi_end(void) __attribute__((always_inline));
 
 static inline void spi_end(void) {
+  while (!(SPSR & _BV(SPIF))); // wait for everything SPI to finish before freeing up the bus
   SPI.endTransaction();
 }
   #else // we do not want to SUPPORT_TRANSACTIONS
@@ -206,7 +207,6 @@ void TFT_ILI9341::init(void)
   SPI.setDataMode(SPI_MODE0);
   mySPCR = SPCR;
 
-  spi_end();
 
   // toggle RST low to reset
   if (TFT_RST > 0) {
@@ -949,7 +949,6 @@ void TFT_ILI9341::setWindow(int16_t x0, int16_t y0, int16_t x1, int16_t y1)
 
 void TFT_ILI9341::setAddrWindow(int16_t x0, int16_t y0, int16_t x1, int16_t y1)
 {
-  spi_begin();
 
   // Column addr set
   TFT_DC_C;
@@ -991,7 +990,6 @@ void TFT_ILI9341::setAddrWindow(int16_t x0, int16_t y0, int16_t x1, int16_t y1)
   //TFT_CS_H;
   TFT_DC_D;
 
-  spi_end();
 }
 
 /*
