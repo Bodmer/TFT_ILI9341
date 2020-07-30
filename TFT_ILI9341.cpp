@@ -803,7 +803,7 @@ int16_t TFT_ILI9341::textWidth(const char *string, int font)
   char uniCode;
   char *widthtable;
 
-  if (font>1 && font<9)
+  if (font>0 && font<9)
   widthtable = (char *)pgm_read_word( &(fontdata[font].widthtbl ) ) - 32; //subtract the 32 outside the loop
   else return 0;
 
