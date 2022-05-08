@@ -803,7 +803,7 @@ int16_t TFT_ILI9341::textWidth(const char *string, int font)
   char uniCode;
   char *widthtable;
 
-  if (font>1 && font<9)
+  if (font>0 && font<9)
   widthtable = (char *)pgm_read_word( &(fontdata[font].widthtbl ) ) - 32; //subtract the 32 outside the loop
   else return 0;
 
@@ -1692,8 +1692,10 @@ int TFT_ILI9341::drawChar(unsigned int uniCode, int x, int y, int font)
   }
 
   int width  = 0;
+#if defined(LOAD_FONT2) || defined(LOAD_RLE)
   int height = 0;
   unsigned int flash_address = 0; // 16 bit address OK for Arduino if font files <60K
+#endif
   uniCode -= 32;
 
 #ifdef LOAD_FONT2
@@ -1718,15 +1720,21 @@ int TFT_ILI9341::drawChar(unsigned int uniCode, int x, int y, int font)
   }
 #endif
 
+#if defined(LOAD_FONT2) || defined(LOAD_RLE)
   int w = width;
-  int pX      = 0;
   int pY      = y;
   byte line = 0;
 
   byte tl = textcolor;
   byte th = textcolor >> 8;
+#endif
+
+#ifdef LOAD_FONT2
+  int pX      = 0;
+
   byte bl = textbgcolor;
   byte bh = textbgcolor >> 8;
+#endif
 
 #ifdef LOAD_FONT2 // chop out 962 bytes of code if we do not need it
   if (font == 2) {
